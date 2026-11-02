@@ -7,7 +7,7 @@ excerpt: "How gretioapp.com handles your data. Last updated November 1, 2026. Th
 
 _Last updated November 1, 2026_
 
-This policy covers this website, gretioapp.com (and gretio.app, which redirects here), run by Surreal Development LLC ("we", "us"). The Gretio app has [its own privacy policy](/privacy-policy-app/). Questions and requests: [contact@surrealdev.com](mailto:contact@surrealdev.com).
+This policy covers this website, gretioapp.com (and gretio.app, which redirects here), run by Surreal Development LLC ("we", "us"). The Gretio app has [its own privacy policy](/privacy-policy-app/). Questions and requests: use our [contact form](https://surrealdev.com/contact/).
 
 ## 1. What We Collect
 
@@ -31,11 +31,11 @@ Form submissions are kept as long as needed to handle your request and any follo
 
 ## 4. Your Rights
 
-Depending on where you live, you can access, correct, delete, or receive a copy of your personal data, object to or restrict its use, or withdraw consent. Email us or use our [contact page](https://surrealdev.com/contact/). In the EEA, UK, or Switzerland you can also complain to your data protection authority.
+Depending on where you live, you can access, correct, delete, or receive a copy of your personal data, object to or restrict its use, or withdraw consent. Use our [contact form](https://surrealdev.com/contact/). In the EEA, UK, or Switzerland you can also complain to your data protection authority.
 
 ## 5. Children
 
-This website isn't directed at children, and we don't knowingly collect data from anyone under 13. If you think a child has given us data, contact us and we'll delete it.
+This website isn't directed at children, and we don't knowingly collect data from anyone under 13. If you think a child has given us data, [contact us](https://surrealdev.com/contact/) and we'll delete it.
 
 ## 6. Changes
 

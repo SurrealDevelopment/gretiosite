@@ -7,7 +7,7 @@ excerpt: "How the Gretio app for iOS and Android handles your data. Last updated
 
 _Last updated November 1, 2026_
 
-This policy covers the Gretio app for iOS and Android, made by Surreal Development LLC ("we", "us"). Questions and requests: [contact@surrealdev.com](mailto:contact@surrealdev.com). Our website has [its own policy](/privacy-policy/).
+This policy covers the Gretio app for iOS and Android, made by Surreal Development LLC ("we", "us"). Questions and requests: use our [contact form](https://surrealdev.com/contact/). Our website has [its own policy](/privacy-policy/).
 
 ## 1. Vehicle Data Stays on Your Device
 
@@ -44,11 +44,11 @@ We use access controls, encryption in transit, and our providers' security measu
 
 ## 6. Your Rights
 
-Depending on where you live, you can access, correct, delete, or receive a copy of your personal data, object to or restrict its use, or withdraw consent. Sign out or delete your account in the app; for anything else email us or use [surrealdev.com/contact](https://surrealdev.com/contact/). In the EEA, UK, or Switzerland you can also complain to your data protection authority.
+Depending on where you live, you can access, correct, delete, or receive a copy of your personal data, object to or restrict its use, or withdraw consent. Sign out or delete your account in the app; for anything else use our [contact form](https://surrealdev.com/contact/). In the EEA, UK, or Switzerland you can also complain to your data protection authority.
 
 ## 7. Children
 
-Gretio isn't for children, and we don't knowingly collect data from anyone under 13. If you think a child has given us data, contact us and we'll delete it.
+Gretio isn't for children, and we don't knowingly collect data from anyone under 13. If you think a child has given us data, [contact us](https://surrealdev.com/contact/) and we'll delete it.
 
 ## 8. Changes
 

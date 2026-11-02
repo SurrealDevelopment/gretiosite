@@ -6,45 +6,45 @@
   --radius: 10px;
 }
 
-/* Colors from the old WordPress site.
-   It had no dark mode; the dark theme keeps its magenta bars and lightens the accents to stay readable. */
+/* Colors from the Gretio gauge icon: navy bars, gauge blue accent, gauge orange on hover. */
 :root,
 :root[data-theme='light'] {
   color-scheme: light;
-  --bg: #fcfcfc;
+  --bg: #f6f8fb;
   --bg-raised: #ffffff;
   --bg-code: #ffffff;
-  --text: #333333;
-  --text-strong: #1e1e1e;
-  --dim: #5e5e5e;
-  --line: #d9d9d9;
-  --accent: #96097a;
+  --text: #2b3442;
+  --text-strong: #0f1a2b;
+  --dim: #5a6576;
+  --line: #d8dee8;
+  --accent: #2563cc;
   --accent-ink: #ffffff;
-  --accent-soft: rgba(150, 9, 122, 0.1);
-  --link: #248cc8;
-  --link-hover: #f47e3c;
-  --bar: #96097a;
-  --bar-hover: #8b00ef;
+  --accent-soft: rgba(37, 99, 204, 0.1);
+  --link: #1f58b8;
+  --link-hover: #b85a1c;
+  --bar: #0f2547;
+  --bar-hover: #1d3d6e;
   --bar-text: #ffffff;
-  --footer-text: #dbdbdb;
-  --footer-link: #e8e8e8;
+  --footer-text: #c9d3e3;
+  --footer-link: #e6ecf5;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #141113;
-  --bg-raised: #1c181b;
-  --bg-code: #1c181b;
-  --text: #e2dde1;
+  --bg: #0d1219;
+  --bg-raised: #141b25;
+  --bg-code: #141b25;
+  --text: #d9e0ea;
   --text-strong: #ffffff;
-  --dim: #a39aa1;
-  --line: #2e282c;
-  --accent: #e05cc6;
-  --accent-ink: #1e0619;
-  --accent-soft: rgba(224, 92, 198, 0.15);
-  --link: #5fb3e4;
-  --link-hover: #f7a06f;
-  --bar: #6e0659;
+  --dim: #95a1b2;
+  --line: #243041;
+  --accent: #6b9cf0;
+  --accent-ink: #0b1526;
+  --accent-soft: rgba(107, 156, 240, 0.15);
+  --link: #7fb0ff;
+  --link-hover: #f0a35c;
+  --bar: #0a1424;
+  --bar-hover: #16294a;
 }
 
 /* ───────── Base ───────── */

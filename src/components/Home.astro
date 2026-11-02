@@ -1,0 +1,40 @@
+---
+import Base from '../layouts/Base.astro';
+import PostList from './PostList.astro';
+import Pagination from './Pagination.astro';
+import { SITE } from '../site';
+import type { Post } from '../lib/posts';
+
+interface Props {
+  posts: Post[];
+  current: number;
+  last: number;
+}
+const { posts, current, last } = Astro.props;
+---
+
+<Base
+  title={current > 1 ? `Page ${current}` : undefined}
+  description={current > 1 ? `Older posts on ${SITE.title}, page ${current}.` : undefined}
+  jsonLd={current === 1 ? {
+    '@type': 'WebSite',
+    name: SITE.title,
+    url: Astro.site!.href,
+    description: SITE.description,
+    publisher: { '@type': 'Organization', name: SITE.company },
+  } : undefined}
+>
+  {current === 1 && (
+    <section class="hero wrap">
+      <p class="kicker mono">// gretio</p>
+      <h1>OBD2 diagnostics for your car, on your phone.</h1>
+      <p class="lede"><a href="/gretio/">Get Gretio</a> · <a href="/gretio-support-vehicles/">Supported vehicles</a></p>
+    </section>
+  )}
+
+  <section class="wrap">
+    {current === 1 ? <h2 class="section-label mono">News</h2> : <h1 class="section-label mono">Posts · page {current}</h1>}
+    {posts.length ? <PostList posts={posts} /> : <p class="dim">No news yet.</p>}
+    <Pagination current={current} last={last} />
+  </section>
+</Base>

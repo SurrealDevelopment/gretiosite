@@ -1,0 +1,7 @@
+# Security contact for gretioapp.com (RFC 9116). Also served at /security.txt.
+# Expires must stay less than a year out: bump it when it comes due.
+Contact: mailto:security@gretioapp.com
+Contact: https://gretioapp.com/contact/
+Expires: 2027-10-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://gretioapp.com/.well-known/security.txt

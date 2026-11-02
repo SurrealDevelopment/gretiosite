@@ -1,0 +1,284 @@
+// POST /api/form, called from worker/index.js
+//
+// Receives the forms defined in page frontmatter (src/components/Form.astro),
+// checks Turnstile, and emails the submission through Microsoft 365 (Graph API sendMail).
+//
+// Settings (wrangler.jsonc, or the Worker's Settings → Variables and Secrets; locally in .dev.vars):
+//   TURNSTILE_SECRET_KEY  Turnstile widget secret
+//   MS_TENANT_ID          Microsoft 365 tenant (directory) ID
+//   MS_CLIENT_ID          ID of the app registration allowed to send mail (README: "Forms")
+//   MS_CLIENT_SECRET      that app's client secret
+//   FORM_FROM             mailbox that sends the email, e.g. contact@gretioapp.com
+//   FORM_TO               where submissions go (comma-separated for several)
+//   FORM_LIMITS           KV namespace binding that limits confirmation emails; without it none are sent
+//   CONFIRM_DAILY_CAP     optional, default 50: most confirmations per day across all forms
+//   SITE_URL              optional, default https://gretioapp.com (used for links in the email)
+//   FORM_DRY_RUN=1        local testing only: print the email instead of sending it
+
+const MAX_FIELD_CHARS = 5000;
+const MAX_BODY_BYTES = 200 * 1024; // text only; forms don't take file uploads
+const LOCAL_HOSTS = ['localhost', '127.0.0.1', '[::1]'];
+
+// Cloudflare's Turnstile test secrets (1x..., 2x..., 3x...). Real secrets start with 0x.
+const isTestSecret = (s) => /^[1-3]x0{20,}/.test(s);
+const EMAIL_RE = /^[A-Za-z0-9!#$%&*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+(?:[A-Za-z]{2,63}|xn--[A-Za-z0-9-]{2,59})$/;
+const isEmail = (v) => v.length <= 254 && v.indexOf('@') <= 64 && EMAIL_RE.test(v);
+
+let manifest; // form id → { title, fields }, from /form-manifest.json (src/pages/form-manifest.json.ts)
+
+export async function handleForm(request, env) {
+  const local = LOCAL_HOSTS.includes(new URL(request.url).hostname);
+  const dryRun = env.FORM_DRY_RUN === '1';
+
+  const mailKeys = ['MS_TENANT_ID', 'MS_CLIENT_ID', 'MS_CLIENT_SECRET'];
+  const missing = ['TURNSTILE_SECRET_KEY', 'FORM_TO', 'FORM_FROM', ...(dryRun ? [] : mailKeys)].filter((k) => !env[k]);
+  if (missing.length) return misconfigured(`missing settings: ${missing.join(', ')}`);
+  // Test keys and dry runs switch off protection or delivery; never allow them on the live site
+  if (!local && isTestSecret(env.TURNSTILE_SECRET_KEY)) return misconfigured('TURNSTILE_SECRET_KEY is a Cloudflare test key');
+  if (!local && dryRun) return misconfigured('FORM_DRY_RUN is set outside localhost');
+
+  const body = await readLimited(request, MAX_BODY_BYTES);
+  if (body === null) return reply(413, 'That submission is too large.');
+  let data;
+  try {
+    data = await new Response(body, { headers: { 'Content-Type': request.headers.get('Content-Type') || '' } }).formData();
+  } catch {
+    return reply(400, 'That submission couldn’t be read.');
+  }
+
+  // Bots fill in the hidden field; pretend it worked
+  if (data.get('_website')) return reply(200, 'Thanks!');
+
+  if (!(await verifyTurnstile(env.TURNSTILE_SECRET_KEY, data.get('cf-turnstile-response'), request, local))) {
+    return reply(400, 'The spam check didn’t pass. Please try again.');
+  }
+
+  // Only real forms and fields, with the labels from the site (not from the browser)
+  manifest ??= await env.ASSETS.fetch(new URL('/form-manifest.json', request.url)).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  if (!manifest) return misconfigured("couldn't load /form-manifest.json");
+  const form = String(data.get('_form') || '');
+  const def_ = Object.hasOwn(manifest, form) ? manifest[form] : null;
+  if (!def_) return reply(400, 'Unknown form.');
+  const defs = def_.fields;
+
+  const allowed = new Set(['_form', '_website', 'cf-turnstile-response', ...defs.map((f) => f.name)]);
+  for (const [name, value] of data.entries()) {
+    if (typeof value !== 'string') return reply(400, 'File uploads aren’t accepted.');
+    if (!allowed.has(name)) return reply(400, 'Unexpected field.');
+  }
+
+  const fields = [];
+  for (const def of defs) {
+    const values = data.getAll(def.name);
+    if (values.length > 1) return reply(400, 'Unexpected field.');
+    const value = String(values[0] ?? '').slice(0, MAX_FIELD_CHARS).trim();
+    if (def.required && !value) return reply(400, `Please fill in “${def.label}”.`);
+    if (value && def.type === 'email' && !isEmail(value)) return reply(400, `“${def.label}” isn’t a valid email address.`);
+    if (value && def.type === 'select' && !def.options?.includes(value)) return reply(400, `Please choose an option for “${def.label}”.`);
+    if (value && def.type === 'checkbox' && value !== 'yes') return reply(400, 'Unexpected field.');
+    fields.push({ name: def.name, label: def.label, value: def.type === 'checkbox' ? (value ? 'Yes' : 'No') : value });
+  }
+
+  const replyTo = fields.find((f) => f.name === 'email' && f.value)?.value; // validated above
+  const subject = fields.find((f) => f.name === 'subject')?.value;
+  const site = (env.SITE_URL || 'https://gretioapp.com').replace(/\/$/, '');
+  const pageUrl = `${site}/${form}/`;
+  // Submissions from anywhere but the live site (e.g. staging.gretioapp.com) say so in the subject
+  const host = new URL(request.url).hostname;
+  const where = host === new URL(site).hostname ? '' : ` (${host})`;
+  const notice = 'Sent through the website form. Everything below was typed by the visitor and is unverified.';
+
+  const email = {
+    from: env.FORM_FROM,
+    to: env.FORM_TO.split(',').map((s) => s.trim()).filter(Boolean),
+    replyTo,
+    subject: `[gretioapp.com form: ${form}]${where} ${subject || `New submission${replyTo ? ` from ${replyTo}` : ''}`}`.replace(/[\r\n]+/g, ' ').slice(0, 200),
+    text: [`Form: ${pageUrl}`, notice, '', ...fields.map((f) => `${f.label}:\n${f.value || '—'}\n`)].join('\n').trim(),
+    html:
+      `<p style="color:#666">Form: <a href="${esc(pageUrl)}">${esc(pageUrl)}</a><br>${esc(notice)}</p>` +
+      fields.map((f) => `<p><strong>${esc(f.label)}</strong><br>${esc(f.value || '—').replace(/\n/g, '<br>')}</p>`).join(''),
+  };
+
+  if (dryRun) {
+    console.log('FORM_DRY_RUN, not sending:', JSON.stringify(email, null, 2));
+    if (replyTo) console.log('FORM_DRY_RUN, confirmation:', JSON.stringify(confirmation(def_.title, pageUrl, env.FORM_FROM, replyTo), null, 2));
+    return reply(200, 'Thanks! Your message was sent. A confirmation is on its way to your inbox.');
+  }
+
+  try {
+    await sendMail(env, email);
+  } catch (e) {
+    console.error(`Sending failed: ${e.message}`);
+    return reply(502, 'Sending failed on our side. Please try again later or email us.');
+  }
+
+  // Confirmation to the visitor. It goes to whatever address was typed in, so it carries nothing
+  // the visitor wrote: nobody can use the form to send their own text from gretioapp.com.
+  let confirmed = false;
+  if (replyTo && (await mayConfirm(env, replyTo, local).catch((e) => (console.error(`Confirmation limit check failed: ${e.message}`), false)))) {
+    try {
+      await sendMail(env, confirmation(def_.title, pageUrl, env.FORM_FROM, replyTo));
+      confirmed = true;
+    } catch (e) {
+      console.error(`Confirmation failed: ${e.message}`); // the submission itself went through
+    }
+  }
+  return reply(200, confirmed ? 'Thanks! Your message was sent. A confirmation is on its way to your inbox.' : 'Thanks! Your message was sent.');
+}
+
+/**
+ * Confirmations go to whatever address was typed in, so they're limited: never to our own domain,
+ * one per address per day, and CONFIRM_DAILY_CAP per day in total. Over a limit the submission still
+ * reaches us; only the confirmation is skipped.
+ */
+async function mayConfirm(env, address, local) {
+  const [local_, domain] = address.toLowerCase().split('@');
+  // Never mail our own organisation: its domain, its subdomains, or any Microsoft tenant domain
+  const own = env.FORM_FROM.split('@').pop().toLowerCase();
+  if (domain === own || domain.endsWith('.' + own) || domain.endsWith('.onmicrosoft.com')) return false;
+  const kv = env.FORM_LIMITS;
+  if (!kv) {
+    if (!local) console.error('Form handler: no FORM_LIMITS KV binding, so no confirmation sent');
+    return local; // local tests without KV still confirm
+  }
+  // One per mailbox, not per spelling: drop +tags, and dots for Gmail (it ignores them)
+  let user = local_.split('+')[0];
+  if (domain === 'gmail.com' || domain === 'googlemail.com') user = user.replaceAll('.', '');
+  const key = `${user}@${domain === 'googlemail.com' ? 'gmail.com' : domain}`;
+  const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key)))]
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  const day = new Date().toISOString().slice(0, 10);
+  const cap = Number(env.CONFIRM_DAILY_CAP) || 50;
+  const [seen, count] = await Promise.all([kv.get(`to:${hash}`), kv.get(`day:${day}`)]);
+  if (seen) return false;
+  if (Number(count) >= cap) {
+    console.error(`Confirmation daily cap (${cap}) reached`);
+    return false;
+  }
+  await Promise.all([
+    kv.put(`to:${hash}`, '1', { expirationTtl: 86400 }),
+    kv.put(`day:${day}`, String(Number(count) + 1), { expirationTtl: 2 * 86400 }),
+  ]);
+  return true;
+}
+
+/** The fixed confirmation email; only the form's title and page come from us, nothing from the visitor. */
+function confirmation(title, pageUrl, from, to) {
+  const lines = [
+    `We received your "${title}" submission on gretioapp.com, and we'll get back to you at this address.`,
+    `If you didn't submit this form, you can ignore this email.`,
+  ];
+  return {
+    from,
+    to: [to],
+    subject: `We received your message - gretioapp.com`,
+    html:
+      lines.map((l) => `<p>${esc(l)}</p>`).join('') +
+      `<p style="color:#666">Gretio<br><a href="${esc(pageUrl)}">${esc(pageUrl)}</a></p>`,
+  };
+}
+
+let token; // { value, expires } for Microsoft Graph, reused while the isolate lives
+
+/** Send through Microsoft 365 as FORM_FROM, using the app's client credentials. */
+async function sendMail(env, email, retry = true) {
+  if (!token || token.expires < Date.now() + 60_000) {
+    const res = await fetch(`https://login.microsoftonline.com/${encodeURIComponent(env.MS_TENANT_ID)}/oauth2/v2.0/token`, {
+      method: 'POST',
+      body: new URLSearchParams({
+        client_id: env.MS_CLIENT_ID,
+        client_secret: env.MS_CLIENT_SECRET,
+        scope: 'https://graph.microsoft.com/.default',
+        grant_type: 'client_credentials',
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    const out = await res.json().catch(() => ({}));
+    if (!res.ok || !out.access_token) throw new Error(`token ${res.status} ${out.error ?? ''}`);
+    token = { value: out.access_token, expires: Date.now() + out.expires_in * 1000 };
+  }
+  const address = (a) => ({ emailAddress: { address: a } });
+  const res = await fetch(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(email.from)}/sendMail`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token.value}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: {
+        subject: email.subject,
+        body: { contentType: 'HTML', content: email.html },
+        toRecipients: email.to.map(address),
+        replyTo: email.replyTo ? [address(email.replyTo)] : [],
+      },
+      saveToSentItems: true,
+    }),
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (res.status === 202) return;
+  // Expired token: get a new one. Throttled: wait as asked (up to 5 s). Either way, try once more.
+  // 500/504 may mean Graph accepted it anyway, so only these are safe to resend
+  if (retry && [401, 429, 502, 503].includes(res.status)) {
+    if (res.status === 401) token = null;
+    const wait = Math.min(Number(res.headers.get('Retry-After')) || 1, 5);
+    if (res.status !== 401) await new Promise((r) => setTimeout(r, wait * 1000));
+    return sendMail(env, email, false);
+  }
+  throw new Error(`sendMail ${res.status}`);
+}
+
+/** The request body, or null once it passes `max` bytes (Content-Length can be missing or wrong). */
+async function readLimited(request, max) {
+  if (Number(request.headers.get('Content-Length') || 0) > max) return null;
+  if (!request.body) return new Uint8Array();
+  const reader = request.body.getReader();
+  const chunks = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > max) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(size);
+  let at = 0;
+  for (const c of chunks) {
+    out.set(c, at);
+    at += c.byteLength;
+  }
+  return out;
+}
+
+async function verifyTurnstile(secret, token, request, local) {
+  if (!token) return false;
+  const body = new FormData();
+  body.append('secret', secret);
+  body.append('response', String(token));
+  const ip = request.headers.get('CF-Connecting-IP');
+  if (ip) body.append('remoteip', ip);
+  try {
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body });
+    const out = await res.json();
+    if (out.success !== true) return false;
+    // A token solved on another site must not work here. Test secrets report a placeholder
+    // hostname, and are only accepted on localhost (checked above).
+    return (local && isTestSecret(secret)) || out.hostname === new URL(request.url).hostname;
+  } catch {
+    return false;
+  }
+}
+
+function misconfigured(why) {
+  console.error(`Form handler misconfigured: ${why}`);
+  return reply(500, 'The form isn’t set up yet. Please email us instead.');
+}
+
+function reply(status, message) {
+  return Response.json({ ok: status === 200, message }, { status });
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+}

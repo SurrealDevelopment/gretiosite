@@ -1,0 +1,7 @@
+# Everything except the form endpoint, the search index and the search page itself
+User-agent: *
+Disallow: /api/
+Disallow: /pagefind/
+Disallow: /search/
+
+Sitemap: https://gretioapp.com/sitemap-index.xml

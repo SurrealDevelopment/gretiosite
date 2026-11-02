@@ -1,0 +1,11 @@
+# Redirects for Workers static assets: https://developers.cloudflare.com/workers/static-assets/redirects/
+
+# Sitemap: Astro writes sitemap-index.xml; scanners and some crawlers try the conventional name
+/sitemap.xml                 /sitemap-index.xml   301
+
+# security.txt lives in .well-known (RFC 9116); the old location points there
+/security.txt                /.well-known/security.txt  301
+
+# Images and thumbnails live in the media bucket (README: "Media")
+/images/*                    https://media.surrealdev.com/images/:splat   301
+/thumbs/*                    https://media.surrealdev.com/thumbs/:splat   301

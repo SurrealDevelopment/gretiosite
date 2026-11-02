@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 export const MEDIA_DIR = 'media';
 export const MEDIA_PREFIXES = ['/images/', '/thumbs/'];
-export const MEDIA_URL = (process.env.MEDIA_URL || 'https://media.surrealdev.com').replace(/\/$/, '');
+export const MEDIA_URL = (process.env.MEDIA_URL || 'https://media.gretioapp.com').replace(/\/$/, '');
 
 const isMedia = (p) => typeof p === 'string' && MEDIA_PREFIXES.some((pre) => p.startsWith(pre));
 const prefixAlt = MEDIA_PREFIXES.map((p) => p.replace(/\//g, '\\/')).join('|');

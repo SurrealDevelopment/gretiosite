@@ -11,5 +11,5 @@
 /gpdr_requests/              https://surrealdev.com/contact/  302
 
 # Images and thumbnails live in the media bucket (README: "Media")
-/images/*                    https://media.surrealdev.com/images/:splat   301
-/thumbs/*                    https://media.surrealdev.com/thumbs/:splat   301
+/images/*                    https://media.gretioapp.com/images/:splat   301
+/thumbs/*                    https://media.gretioapp.com/thumbs/:splat   301

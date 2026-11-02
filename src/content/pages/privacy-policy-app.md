@@ -15,7 +15,7 @@ VINs, scan results, trouble codes, recordings, and your dashboards are stored on
 
 ## 2. What We Collect
 
-**Account.** If you sign in: your email, display name, and account identifier from Apple, Google, or email sign-in. Your password stays with that provider.
+**Account.** If you continue as a guest, the app creates an anonymous account with only an account identifier. It isn't linked to your name or email, and it can't be recovered if the app is removed or the device is lost. If you sign in: your email, display name, and account identifier from Apple, Google, or email sign-in. Your password stays with that provider.
 
 **Purchases.** Handled by the App Store or Google Play; we never see payment details. RevenueCat manages subscriptions for us and receives your account identifier and purchase history.
 
@@ -27,7 +27,7 @@ Gretio shows no ads, uses no advertising identifiers, and doesn't request your l
 
 ## 3. How We Use It
 
-To provide your account and purchases; to find and fix problems and keep the service secure; to understand which features are used so we can improve them; and to meet legal obligations. Under GDPR these rest on contract, legitimate interest, and legal obligation respectively. You can use Gretio without an account; one is needed only for purchases.
+To provide your account and purchases; to find and fix problems and keep the service secure; to understand which features are used so we can improve them; and to meet legal obligations. Under GDPR these rest on contract, legitimate interest, and legal obligation respectively. You don't have to sign in: a guest account works too, including for purchases, but only signing in lets you recover your account and purchases on a new device.
 
 ## 4. Who We Share It With
 

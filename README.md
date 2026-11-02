@@ -83,7 +83,7 @@ The Entra app gets no API permissions in Entra. It's scoped to the one mailbox i
 ```powershell
 Connect-ExchangeOnline -Device
 New-ServicePrincipal -AppId <client-id> -ObjectId <enterprise-app-object-id> -DisplayName "gretioapp.com forms"
-New-ManagementScope -Name "Website forms mailbox" -RecipientRestrictionFilter "PrimarySmtpAddress -eq 'contact@gretioapp.com'"
+New-ManagementScope -Name "Website forms mailbox" -RecipientRestrictionFilter "PrimarySmtpAddress -eq 'contact@surrealdev.com'"
 New-ManagementRoleAssignment -App <client-id> -Role "Application Mail.Send" -CustomResourceScope "Website forms mailbox"
 ```
 
@@ -95,8 +95,10 @@ Local test: `cp .dev.vars.example .dev.vars`, then `npm run preview`. `FORM_DRY_
 
 1. **R2:** bucket `gretioapp`, custom domain `media.gretioapp.com`, API token (Object Read & Write, this bucket) in `.env`.
 2. **Turnstile:** widget with hostnames `gretioapp.com`, `www.gretioapp.com`, `staging.gretioapp.com` (and `localhost` to test real keys).
+_For now the forms send through the surrealdev.com mailbox (`contact@surrealdev.com`), reusing that site's Entra app and Exchange scope: copy `MS_TENANT_ID`, `MS_CLIENT_ID` and `MS_CLIENT_SECRET` from the `surrealdev` Worker and skip steps 3–5. They're only needed if the forms move to a gretioapp.com mailbox._
+
 3. **Entra:** App registrations → New registration (single tenant) → client secret (expires; max 24 months). Object ID for `New-ServicePrincipal` is under Enterprise applications, not App registrations.
-4. **Exchange:** the PowerShell above (`Install-Module ExchangeOnlineManagement` first; `docker run -it --rm mcr.microsoft.com/powershell` works). Check with `Test-ServicePrincipalAuthorization -Identity <client-id> -Resource contact@gretioapp.com` → InScope True.
+4. **Exchange:** the PowerShell above (`Install-Module ExchangeOnlineManagement` first; `docker run -it --rm mcr.microsoft.com/powershell` works). Check with `Test-ServicePrincipalAuthorization -Identity <client-id> -Resource contact@surrealdev.com` → InScope True.
 5. **DKIM:** Microsoft Defender → Email authentication settings → DKIM → gretioapp.com → add its two CNAMEs in Cloudflare (DNS only) → enable.
 6. **KV:** create a namespace and put its ID in both `FORM_LIMITS` entries in `wrangler.jsonc`.
 6b. **gretio.app:** add the zone to Cloudflare, create proxied DNS records `gretio.app` and `www` (AAAA `100::`), then Rules → Redirect Rules → custom rule: all incoming requests → dynamic `concat("https://gretioapp.com", http.request.uri.path)`, 301, preserve query string.

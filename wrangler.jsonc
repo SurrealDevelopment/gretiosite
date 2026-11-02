@@ -20,8 +20,8 @@
   // Don't delete variables set in the dashboard on deploy
   "keep_vars": true,
   "vars": {
-    "FORM_FROM": "contact@gretioapp.com",
-    "FORM_TO": "contact@gretioapp.com"
+    "FORM_FROM": "contact@surrealdev.com",
+    "FORM_TO": "contact@surrealdev.com"
   },
   "kv_namespaces": [{ "binding": "FORM_LIMITS", "id": "TODO-create-with-wrangler-kv-namespace-create" }],
   // gretio.app and www.gretio.app are not routed here: a Cloudflare Redirect Rule on that
@@ -44,8 +44,8 @@
       },
       "keep_vars": true,
       "vars": {
-        "FORM_FROM": "contact@gretioapp.com",
-        "FORM_TO": "contact@gretioapp.com",
+        "FORM_FROM": "contact@surrealdev.com",
+        "FORM_TO": "contact@surrealdev.com",
         "NOINDEX": "1"
       },
       "kv_namespaces": [{ "binding": "FORM_LIMITS", "id": "TODO-create-with-wrangler-kv-namespace-create" }]

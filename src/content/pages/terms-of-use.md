@@ -31,4 +31,4 @@ THE WEBSITE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. TO THE MAXIMUM E
 
 ## 6. Governing Law and Changes
 
-These terms are governed by the laws of South Dakota, United States. We may change them by posting a new version and updating the date above. Questions: [contact](/contact/).
+These terms are governed by the laws of South Dakota, United States. We may change them by posting a new version and updating the date above. Questions: [contact](https://surrealdev.com/contact/).

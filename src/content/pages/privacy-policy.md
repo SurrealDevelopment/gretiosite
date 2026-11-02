@@ -15,7 +15,7 @@ This policy covers this website, gretioapp.com (and gretio.app, which redirects 
 
 **Technical data.** Like any website, our hosting and security providers process basic technical information such as your IP address to deliver pages and protect the site from abuse, and may use strictly necessary cookies to do so.
 
-**Forms.** If you submit a form (such as [contact](/contact/) or a [data request](/gpdr_requests/)), what you send is delivered to us by email and used only to respond to you or handle your request. We use a third-party service to check that submissions aren't from bots.
+**Forms.** If you submit a form (such as the [BiScan account migration](/biscan-account-migration/) form), what you send is delivered to us by email and used only to respond to you or handle your request. We use a third-party service to check that submissions aren't from bots.
 
 Embedded content (such as videos) and links to other websites are covered by those websites' own privacy policies.
 
@@ -31,7 +31,7 @@ Form submissions are kept as long as needed to handle your request and any follo
 
 ## 4. Your Rights
 
-Depending on where you live, you can access, correct, delete, or receive a copy of your personal data, object to or restrict its use, or withdraw consent. Email us or use the [data request form](/gpdr_requests/). In the EEA, UK, or Switzerland you can also complain to your data protection authority.
+Depending on where you live, you can access, correct, delete, or receive a copy of your personal data, object to or restrict its use, or withdraw consent. Email us or use our [contact page](https://surrealdev.com/contact/). In the EEA, UK, or Switzerland you can also complain to your data protection authority.
 
 ## 5. Children
 

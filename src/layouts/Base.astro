@@ -58,8 +58,8 @@ const year = new Date().getUTCFullYear();
     {modified && <meta property="article:modified_time" content={modified.toISOString()} />}
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', ...jsonLd }).replace(/</g, '\\u003c')} />}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#0a1424" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#0f2547" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#211F24" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F2ECF4" media="(prefers-color-scheme: light)" />
     <script is:inline>
       (() => {
         let t;
@@ -99,7 +99,7 @@ const year = new Date().getUTCFullYear();
     <footer class="site-footer">
       <div class="wrap footer-inner">
         <div>
-          <p class="mono dim">© {year} {SITE.company}</p>
+          <p class="mono dim"><a class="footer-company" href="https://surrealdev.com/">© {year} {SITE.company}</a></p>
           <p class="footer-links mono">
             <a href="/archive/">Archive</a>
             <a href="/rss.xml">RSS</a>

@@ -6,6 +6,10 @@
 # security.txt lives in .well-known (RFC 9116); the old location points there
 /security.txt                /.well-known/security.txt  301
 
+# Contact and data requests are handled on surrealdev.com for now
+/contact/                    https://surrealdev.com/contact/  302
+/gpdr_requests/              https://surrealdev.com/contact/  302
+
 # Images and thumbnails live in the media bucket (README: "Media")
 /images/*                    https://media.surrealdev.com/images/:splat   301
 /thumbs/*                    https://media.surrealdev.com/thumbs/:splat   301

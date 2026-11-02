@@ -44,7 +44,7 @@ We use access controls, encryption in transit, and our providers' security measu
 
 ## 6. Your Rights
 
-Depending on where you live, you can access, correct, delete, or receive a copy of your personal data, object to or restrict its use, or withdraw consent. Sign out or delete your account in the app; for anything else email us or use [gretioapp.com/gpdr_requests](/gpdr_requests/). In the EEA, UK, or Switzerland you can also complain to your data protection authority.
+Depending on where you live, you can access, correct, delete, or receive a copy of your personal data, object to or restrict its use, or withdraw consent. Sign out or delete your account in the app; for anything else email us or use [surrealdev.com/contact](https://surrealdev.com/contact/). In the EEA, UK, or Switzerland you can also complain to your data protection authority.
 
 ## 7. Children
 

@@ -15,7 +15,7 @@ export const NAV = [
   { label: 'News', href: '/' },
   { label: 'Gretio', href: '/gretio/' },
   { label: 'Vehicles', href: '/gretio-support-vehicles/' },
-  { label: 'Contact', href: '/contact/' },
+  { label: 'Contact', href: 'https://surrealdev.com/contact/' },
 ];
 
 export const SOCIAL: { label: string; href: string }[] = [];

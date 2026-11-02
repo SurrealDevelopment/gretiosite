@@ -103,7 +103,7 @@ _For now the forms send through the surrealdev.com mailbox (`contact@surrealdev.
 6. **KV:** create a namespace and put its ID in both `FORM_LIMITS` entries in `wrangler.jsonc`.
 6b. **gretio.app:** add the zone to Cloudflare, create proxied DNS records `gretio.app` and `www` (AAAA `100::`), then Rules → Redirect Rules → custom rule: all incoming requests → dynamic `concat("https://gretioapp.com", http.request.uri.path)`, 301, preserve query string.
 7. **Worker:** Workers & Pages → Create → Import a repository → this repo. Build command `npm run build`, deploy command `npm run deploy`, non-production branch deploy command `npm run deploy:branch`. Add the variables above to `gretio`, and after the first staging deploy, to `gretio-staging`.
-8. **Domains:** production routes are in `wrangler.jsonc`; for staging, uncomment `routes` under `env.staging`.
+8. **Domains:** production routes are in `wrangler.jsonc`; for staging, set `routes` under `env.staging` (the commented example).
 9. **WAF:** rate-limiting rule on `/api/form`, e.g. 3 requests per 10 seconds per IP.
 
 ## Deploy

@@ -9,6 +9,7 @@
 # Contact and data requests are handled on surrealdev.com for now
 /contact/                    https://surrealdev.com/contact/  302
 /gpdr_requests/              https://surrealdev.com/contact/  302
+/biscan-account-migration/   https://surrealdev.com/biscan-account-migration/  302
 
 # Images and thumbnails live in the media bucket (README: "Media")
 /images/*                    https://media.gretioapp.com/images/:splat   301

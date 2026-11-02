@@ -23,7 +23,8 @@
     "FORM_FROM": "contact@surrealdev.com",
     "FORM_TO": "contact@surrealdev.com"
   },
-  "kv_namespaces": [{ "binding": "FORM_LIMITS", "id": "TODO-create-with-wrangler-kv-namespace-create" }],
+  // No forms on the site right now. If one is added, create a KV namespace and uncomment (README: "Setup").
+  // "kv_namespaces": [{ "binding": "FORM_LIMITS", "id": "<id>" }],
   // gretio.app and www.gretio.app are not routed here: a Cloudflare Redirect Rule on that
   // zone 301s them to https://gretioapp.com (README: "Setup"), so the site only lives at one domain
   "routes": [
@@ -48,8 +49,10 @@
         "FORM_TO": "contact@surrealdev.com",
         "NOINDEX": "1"
       },
-      "kv_namespaces": [{ "binding": "FORM_LIMITS", "id": "TODO-create-with-wrangler-kv-namespace-create" }]
-      // "routes": [{ "pattern": "staging.gretioapp.com", "custom_domain": true }]
+      // "kv_namespaces": [{ "binding": "FORM_LIMITS", "id": "<id>" }],
+      // Must be set: without it staging inherits the top-level routes and takes gretioapp.com from production.
+      // For a staging domain: [{ "pattern": "staging.gretioapp.com", "custom_domain": true }]
+      "routes": []
     }
   }
 }

@@ -101,10 +101,6 @@ const year = new Date().getUTCFullYear();
         <div>
           <p class="mono dim"><a class="footer-company" href="https://surrealdev.com/">© {year} {SITE.company}</a></p>
           <p class="footer-links mono">
-            <a href="/archive/">Archive</a>
-            <a href="/rss.xml">RSS</a>
-          </p>
-          <p class="footer-links mono">
             <a href="/privacy-policy/">Privacy</a>
             <a href="/terms-of-use/">Terms</a>
             <a href="/privacy-policy-app/">App privacy</a>
@@ -112,10 +108,16 @@ const year = new Date().getUTCFullYear();
           </p>
         </div>
         <div class="footer-right">
-          <p class="footer-links mono">
-            {SOCIAL.map((s) => <a href={s.href} rel="me noopener">{s.label}</a>)}
-          </p>
+          {SOCIAL.length > 0 && (
+            <p class="footer-links mono">
+              {SOCIAL.map((s) => <a href={s.href} rel="me noopener">{s.label}</a>)}
+            </p>
+          )}
           <p class="footer-links mono"><a href={SITE.source}>Source code of this website</a></p>
+          <p class="footer-links mono">
+            <a href="/archive/">Archive</a>
+            <a href="/rss.xml">RSS</a>
+          </p>
         </div>
       </div>
     </footer>
